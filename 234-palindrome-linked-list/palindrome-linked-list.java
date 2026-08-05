@@ -1,44 +1,40 @@
 class Solution {
     public boolean isPalindrome(ListNode head) {
-        if (head == null || head.next == null) {
-            return true;
-        }
+        if (head == null || head.next == null) return true;
 
-        ListNode slow = head;
-        ListNode fast = head;
-        
-        while (fast != null && fast.next != null) {
+        // slow lands at the END of the first half (for both odd & even lengths)
+        ListNode slow = head, fast = head;
+        while (fast.next != null && fast.next.next != null) {
             slow = slow.next;
             fast = fast.next.next;
         }
 
-        ListNode secondHalfHead = reverseList(slow);
+        // Reverse the second half in place
+        ListNode secondHalf = reverse(slow.next);
 
-        ListNode ptr1 = head;
-        ListNode ptr2 = secondHalfHead;
-        
-        while (ptr2 != null) {
-            if (ptr1.val != ptr2.val) {
-                return false;
-            }
-            ptr1 = ptr1.next;
-            ptr2 = ptr2.next;
+        // Compare first half vs reversed second half
+        ListNode p1 = head, p2 = secondHalf;
+        boolean isPalin = true;
+        while (p2 != null) {
+            if (p1.val != p2.val) { isPalin = false; break; }
+            p1 = p1.next;
+            p2 = p2.next;
         }
 
-        return true;
+        // Restore original list (so input is not mutated)
+        slow.next = reverse(secondHalf);
+
+        return isPalin;
     }
 
-    private ListNode reverseList(ListNode head) {
-        ListNode ptr_cache = null;
-        ListNode ptr = head;
-        
-        while (ptr != null) {
-            ListNode nextNode = ptr.next;
-            ptr.next = ptr_cache;
-            ptr_cache = ptr;
-            ptr = nextNode;
+    private ListNode reverse(ListNode head) {
+        ListNode prev = null;
+        while (head != null) {
+            ListNode next = head.next;
+            head.next = prev;
+            prev = head;
+            head = next;
         }
-
-        return ptr_cache;
+        return prev;
     }
 }
